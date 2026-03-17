@@ -13,6 +13,24 @@ with open("feature_cols.pkl",        "rb") as f: feature_cols= pickle.load(f)
 @app.route("/test", methods=["GET"])
 def test():
     return jsonify({"status":"ok","classes":list(le.classes_),"features":feature_cols})
+    # Correction latence Render (soustrait le délai serveur ~200ms)
+latence = float(data.get("latence_ms", 50))
+latence_corrigee = max(20.0, latence - 200.0)
+
+feature_map = {
+    "RSRP":                  rsrp,
+    "RSRQ":                  rsrq,
+    "SINR":                  sinr,
+    "RSSI":                  rssi,
+    "Latence_ms":            latence_corrigee,  # ← corrigée
+    "Jitter_ms":             float(data.get("jitter_ms", 5)),
+    "Packet_Loss_%":         float(data.get("perte_paquets_pct", 0)),
+    "Download_Mbps":         float(data.get("download_mbps", 8)),
+    "Upload_Mbps":           float(data.get("upload_mbps", 2)),
+    "Signal_Strength_Level": level,
+    "Network_Type_enc":      net_val,
+    "Operator_enc":          op_val,
+}
 
 @app.route("/predict", methods=["POST"])
 def predict():
