@@ -17,21 +17,21 @@ def test():
 latence = float(data.get("latence_ms", 50))
 latence_corrigee = max(20.0, latence - 200.0)
 
+# Multiplier download/upload par 10 pour correspondre au dataset
 feature_map = {
     "RSRP":                  rsrp,
     "RSRQ":                  rsrq,
     "SINR":                  sinr,
     "RSSI":                  rssi,
-    "Latence_ms":            latence_corrigee,  # ← corrigée
+    "Latence_ms":            max(10.0, latence_corrigee / 3.0),  # ← diviser par 3
     "Jitter_ms":             float(data.get("jitter_ms", 5)),
     "Packet_Loss_%":         float(data.get("perte_paquets_pct", 0)),
-    "Download_Mbps":         float(data.get("download_mbps", 8)),
-    "Upload_Mbps":           float(data.get("upload_mbps", 2)),
+    "Download_Mbps":         float(data.get("download_mbps", 8)) * 10.0,  # ← multiplier par 10
+    "Upload_Mbps":           float(data.get("upload_mbps", 2)) * 10.0,    # ← multiplier par 10
     "Signal_Strength_Level": level,
     "Network_Type_enc":      net_val,
     "Operator_enc":          op_val,
 }
-
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
